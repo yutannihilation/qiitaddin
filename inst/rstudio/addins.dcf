@@ -1,0 +1,4 @@
+Name: Post to Qiita
+Description: Knit an R Markdown file and post the result Markdown file to Qiita
+Binding: qiitaddin_knit
+Interactive: true

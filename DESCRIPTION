@@ -1,0 +1,17 @@
+Package: qiitaddin
+Type: Package
+Title: Use Qiita Instead Of Rpubs
+Version: 0.1.0
+Author: Hiroaki Yutani
+Maintainer: Hiroaki Yutani <yutani.ini@gmail.com>
+Description: Knit an R Markdown file and post the result Markdown file to
+    Qiita
+License: MIT + file LICENSE
+Imports:
+  rmarkdown
+Remotes:
+  yutannihilation/qiitr,
+  rstudio/shiny,
+  rstudio/shinygadgets
+LazyData: TRUE
+RoxygenNote: 5.0.1
