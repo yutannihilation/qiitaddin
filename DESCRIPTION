@@ -8,10 +8,12 @@ Description: Knit an R Markdown file and post the result Markdown file to
     Qiita
 License: MIT + file LICENSE
 Imports:
-  rmarkdown
+  rmarkdown,
+  rstudioapi
 Remotes:
   yutannihilation/qiitr,
   rstudio/shiny,
+  rstudio/htmltools,
   rstudio/shinygadgets
 LazyData: TRUE
 RoxygenNote: 5.0.1

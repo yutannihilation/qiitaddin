@@ -5,8 +5,6 @@ RStudio Addin to Post to Qiita
 
 ### Installation
 
-I guess you cannot install this now because of some error during installation of shinygadgets. Wait for the time to come.
-
 ```r
 library(devtools)
 install_github("yutannihilation/qiitaddin")
