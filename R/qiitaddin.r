@@ -30,15 +30,21 @@ qiitaddin_knit <- function() {
   # Shiny Server -------------------------------------------------------
   server <- function(input, output, session) {
     shiny::observeEvent(input$done, {
-      token <- .rs.askForPassword("Input Qiita access token:")
+
+      if(identical(Sys.getenv("QIITA_ACCESSTOKEN"), "")) {
+        token <- .rs.askForPassword("Input Qiita access token:")
+        Sys.setenv(QIITA_ACCESSTOKEN = token)
+        return(FALSE)
+      }
 
       result <- qiitr::qiita_post_item(
-        url = "https://qiita.com",
-        token = token,
         title = front_matter$title,
-        tags = lapply(front_matter$tags, qiitr::qiita_tag),
-        body = body,
-        private = TRUE
+        body = body,        
+        tags = lapply(front_matter$tags, qiitr::qiita_util_tag),
+        coediting = FALSE,        
+        private   = TRUE,
+        gist      = FALSE,
+        tweet     = FALSE
       )
 
       invisible(stopApp())
