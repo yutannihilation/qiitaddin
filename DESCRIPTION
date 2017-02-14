@@ -1,7 +1,7 @@
 Package: qiitaddin
 Type: Package
 Title: Use Qiita Instead Of Rpubs
-Version: 0.1.0
+Version: 0.1.0.9000
 Author: Hiroaki Yutani
 Maintainer: Hiroaki Yutani <yutani.ini@gmail.com>
 Description: Knit an R Markdown file and post the result Markdown file to
