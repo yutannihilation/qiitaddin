@@ -8,4 +8,3 @@
 \description{
 Knit an R Markdown file and post the result Markdown file to Qiita
 }
-
