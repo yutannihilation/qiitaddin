@@ -9,4 +9,3 @@ qiitaddin_knit()
 \description{
 Knit the active document and display it
 }
-
