@@ -20,9 +20,9 @@ qiitaddin_knit <- function() {
   body <- paste(readLines(output_file, encoding = "UTF-8"), collapse = "\n")
 
   # Shiny UI -----------------------------------------------------------
-  ui <- shinygadgets::gadgetPage(
-    shinygadgets::titlebar("Preview"),
-    shinygadgets::contentPanel(
+  ui <- miniUI::miniPage(
+    miniUI::gadgetTitleBar("Preview"),
+    miniUI::miniContentPanel(
       shiny::div(shiny::includeMarkdown(output_file))
     )
   )
@@ -39,9 +39,9 @@ qiitaddin_knit <- function() {
 
       result <- qiitr::qiita_post_item(
         title = front_matter$title,
-        body = body,        
+        body = body,
         tags = lapply(front_matter$tags, qiitr::qiita_util_tag),
-        coediting = FALSE,        
+        coediting = FALSE,
         private   = TRUE,
         gist      = FALSE,
         tweet     = FALSE
@@ -52,6 +52,6 @@ qiitaddin_knit <- function() {
     })
   }
 
-  viewer <- shinygadgets::dialogViewer("Preview", width = 1000, height = 800)
-  shinygadgets::runGadget(ui, server, viewer = viewer)
+  viewer <- shiny::dialogViewer("Preview", width = 1000, height = 800)
+  shiny::runGadget(ui, server, viewer = viewer)
 }
