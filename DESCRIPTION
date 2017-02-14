@@ -13,6 +13,9 @@ Imports:
   qiitr,
   shiny,
   htmltools,
-  miniUI
+  miniUI,
+  xml2,
+  commonmark
 LazyData: TRUE
 RoxygenNote: 6.0.1
+Roxygen: list(markdown = TRUE)

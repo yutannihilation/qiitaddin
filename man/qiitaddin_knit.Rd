@@ -2,10 +2,13 @@
 % Please edit documentation in R/qiitaddin.r
 \name{qiitaddin_knit}
 \alias{qiitaddin_knit}
-\title{Knit the active document and display it}
+\title{Knit And Post A Rmarkdown Document to Qiita}
 \usage{
-qiitaddin_knit()
+qiitaddin_knit(input = NULL)
+}
+\arguments{
+\item{input}{path to a .Rmd file. If \code{NULL}, use the activedocument.}
 }
 \description{
-Knit the active document and display it
+Knit And Post A Rmarkdown Document to Qiita
 }
