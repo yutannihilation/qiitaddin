@@ -19,7 +19,7 @@ upload_image_imgur <- function(file) {
 
 
 upload_image_imgur_anonymously <- function(file) {
-  res <- imguR::upload_image(file, key = NULL)
+  res <- imguR::upload_image(file)
 
   if(is.null(res$link)) {
     stop("No URL is returned: %s", res)
