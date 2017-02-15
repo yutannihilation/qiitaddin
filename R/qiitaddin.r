@@ -38,26 +38,23 @@ qiitaddin_upload <- function(md_file, title, tags) {
     miniUI::gadgetTitleBar("Preview"),
     miniUI::miniContentPanel(
       shiny::fluidRow(
-        shiny::column(4, shiny::textInput("title", "title", "")),
+        shiny::column(1, shiny::span("properties:")),
         shiny::column(1, shiny::checkboxInput("coediting", "coediting")),
         shiny::column(1, shiny::checkboxInput("private", "private", TRUE)),
         shiny::column(1, shiny::checkboxInput("gist", "gist")),
-        shiny::column(1, shiny::checkboxInput("tweet", "tweet"))
-      ),
-      shiny::fluidRow(
+        shiny::column(1, shiny::checkboxInput("tweet", "tweet")),
         shiny::column(4, shiny::selectInput("upload_method", label = "Upload images to",
                                             choices = c("Imgur", "Gyazo", "Imgur(anonymous)")))
       ),
       # TODO: tag
       shiny::hr(),
+      shiny::h1(title, align = "center"),
       shiny::div(shiny::includeMarkdown(md_file))
     )
   )
 
   # Shiny Server -------------------------------------------------------
   server <- function(input, output, session) {
-    shiny::updateTextInput(session, "title", value = title)
-
     shiny::observeEvent(input$done, {
       if(identical(Sys.getenv("QIITA_ACCESSTOKEN"), "")) {
         token <- rstudioapi::askForPassword("Input Qiita access token:")
@@ -90,7 +87,7 @@ qiitaddin_upload <- function(md_file, title, tags) {
       # Step 2) Upload to Qiita
       progress$set(message = "Uploading the document to Qiita...", detail = "")
       result <- qiitr::qiita_post_item(
-        title = input$title,
+        title = title,
         body = md_text,
         tags = qiitr::qiita_util_tag("R"),
         # TODO: post without any tag is not permitted.
