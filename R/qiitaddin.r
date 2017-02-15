@@ -39,12 +39,15 @@ qiitaddin_upload <- function(md_file, title, tags) {
     miniUI::miniContentPanel(
       shiny::fluidRow(
         shiny::column(1, shiny::span("properties:")),
-        shiny::column(1, shiny::checkboxInput("coediting", "coediting")),
-        shiny::column(1, shiny::checkboxInput("private", "private", TRUE)),
-        shiny::column(1, shiny::checkboxInput("gist", "gist")),
-        shiny::column(1, shiny::checkboxInput("tweet", "tweet")),
-        shiny::column(4, shiny::selectInput("upload_method", label = "Upload images to",
-                                            choices = c("Imgur", "Gyazo", "Imgur(anonymous)")))
+        shiny::column(1,
+                      shiny::checkboxInput("coediting", "coediting"),
+                      shiny::checkboxInput("private", "private", TRUE)),
+        shiny::column(1,
+                      shiny::checkboxInput("gist", "gist"),
+                      shiny::checkboxInput("tweet", "tweet")),
+        shiny::column(4,
+                      shiny::selectInput("upload_method", label = "Upload images to",
+                                         choices = c("Imgur", "Gyazo", "Imgur(anonymous)")))
       ),
       # TODO: tag
       shiny::hr(),

@@ -35,7 +35,6 @@ qiitaddin::qiitaddin_knit("path/to/file.Rmd")
 
 After knitting the document is finished, the preview window appears. Review the document and edit the following items if necessary.
 
-* `title`: The title of this document.
 * `coediting`: A flag whether this item is co-edit mode (only available on Qiita:Team).
 * `private`: A flag whether this item is private (only available on Qiita).
 * `gist`: A flag to post data to Gist (only available if GitHub integration is enabled).
@@ -45,9 +44,8 @@ After knitting the document is finished, the preview window appears. Review the 
 ![](usage2.png)
 
 
-When things are done, click "Done". If you don't set `QIITA_ACCESSTOKEN` environmental variable, you will be asked to provide your Qiita access token as shown bellow.
+When things are done, click "Done". (If you don't set `QIITA_ACCESSTOKEN` environmental variable, you will be asked to provide your Qiita access token)
 
-![](usage3.png)
 
 After that, the document is posted to Qiita and you will jump to the page.
 
