@@ -20,18 +20,16 @@ qiitaddin_knit <- function(input = NULL) {
 
   front_matter <- rmarkdown::yaml_front_matter(input, "UTF-8")
 
-  qiitaddin_post_qiita(
+  qiitaddin_upload(
     md_file = md_file,
     title   = front_matter$title,
     tags    = front_matter$tags
   )
 }
 
-qiitaddin_post_qiita <- function(md_file, title, tags) {
+qiitaddin_upload <- function(md_file, title, tags) {
   md_text <- read_utf8(md_file)
   imgs <- qiitaddin_extract_image_paths(md_text)
-
-  imgur_token <- imguR::imgur_login()
 
   # Shiny UI -----------------------------------------------------------
   ui <- miniUI::miniPage(
@@ -44,10 +42,7 @@ qiitaddin_post_qiita <- function(md_file, title, tags) {
         shiny::column(1, shiny::checkboxInput("gist", "gist")),
         shiny::column(1, shiny::checkboxInput("tweet", "tweet"))
       ),
-      shiny::div(
-        shiny::actionButton("upload", "Upload to imgur"),
-        shiny::textOutput("upload_result")
-      ),
+      # TODO: tag
       shiny::hr(),
       shiny::div(shiny::includeMarkdown(md_file))
     )
@@ -57,35 +52,39 @@ qiitaddin_post_qiita <- function(md_file, title, tags) {
   server <- function(input, output, session) {
     shiny::updateTextInput(session, "title", value = title)
 
-    shiny::observeEvent(input$upload, {
-      progress <- shiny::Progress$new(session, min=0, max=length(imgs))
-      on.exit(progress$close())
-
-      progress$set(message = "Uploading",
-                   detail  = "...")
-
-      for (i in 1:length(imgs)) {
-        progress$set(value = i, detail = imgs[i])
-        res <- imguR::upload_image(imgs[i], key = NULL, token = imgur_token)
-        md_text <- stringr::str_replace_all(md_text, stringr::fixed(imgs[i]), res$link)
-        Sys.sleep(0.5)
-      }
-
-      writeLines(md_text, md_file)
-      output$upload_result <- shiny::renderText("Done")
-      shiny::updateActionButton(session, "upload", icon = shiny::icon("check"))
-    })
-
     shiny::observeEvent(input$done, {
+      # check credentials for Imgur and Qiita
+      imgur_token <- imguR::imgur_login()
+
       if(identical(Sys.getenv("QIITA_ACCESSTOKEN"), "")) {
         token <- rstudioapi::askForPassword("Input Qiita access token:")
         Sys.setenv(QIITA_ACCESSTOKEN = token)
         return(FALSE)
       }
 
+      progress <- shiny::Progress$new(session, min=0, max=2)
+      on.exit(progress$close())
+
+      # Step 1) Upload to Imgur
+      progress$set(message = "Uploading the images to Imgur...")
+      num_imgs <- length(imgs)
+
+      for (i in 1:num_imgs) {
+        progress$set(detail = imgs[i])
+        res <- imguR::upload_image(imgs[i], key = NULL, token = imgur_token)
+        progress$set(value = i/num_imgs)
+
+        md_text <- stringr::str_replace_all(md_text, stringr::fixed(imgs[i]), res$link)
+      }
+
+      # Write the modified Markdown text to another file
+      writeLines(md_text, paste0(md_file,".uploaded"))
+
+      # Step 2) Upload to Qiita
+      progress$set(message = "Uploading the document to Qiita...", detail = "")
       result <- qiitr::qiita_post_item(
         title = input$title,
-        body = read_utf8(md_file),
+        body = md_text,
         tags = qiitr::qiita_util_tag("R"),
         # TODO: post without any tag is not permitted.
         # tags = lapply(tags, qiitr::qiita_util_tag),
@@ -95,6 +94,9 @@ qiitaddin_post_qiita <- function(md_file, title, tags) {
         tweet     = input$tweet
       )
 
+      progress$set(value = 2, message = "Done!")
+      Sys.sleep(2)
+
       invisible(stopApp())
       return(result)
     })
@@ -102,11 +104,6 @@ qiitaddin_post_qiita <- function(md_file, title, tags) {
 
   viewer <- shiny::dialogViewer("Preview", width = 1000, height = 800)
   shiny::runGadget(ui, server, viewer = viewer)
-}
-
-
-qiitaddin_upload_images <- function(imgs) {
-
 }
 
 read_utf8 <- function(x) {
