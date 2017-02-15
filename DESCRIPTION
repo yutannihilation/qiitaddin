@@ -5,7 +5,7 @@ Version: 0.1.0.9000
 Author: Hiroaki Yutani
 Maintainer: Hiroaki Yutani <yutani.ini@gmail.com>
 Description: Knit an R Markdown file and post the result Markdown file to
-    Qiita
+    'Qiita'.
 License: MIT + file LICENSE
 Depends:
   R (>= 2.10)

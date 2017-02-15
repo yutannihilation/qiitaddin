@@ -136,7 +136,7 @@ qiitaddin_upload <- function(md_file, title, tags) {
 
       utils::browseURL(result$url)
 
-      invisible(stopApp())
+      invisible(shiny::stopApp())
       return(result)
     })
   }
