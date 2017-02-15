@@ -28,13 +28,26 @@ qiitaddin_knit <- function(input = NULL) {
 }
 
 qiitaddin_post_qiita <- function(md_file, title, tags) {
-  body <- paste(readLines(md_file, encoding = "UTF-8"), collapse = "\n")
+  md_text <- read_utf8(md_file)
+  imgs <- qiitaddin_extract_image_paths(md_text)
+
+  imgur_token <- imguR::imgur_login()
 
   # Shiny UI -----------------------------------------------------------
   ui <- miniUI::miniPage(
     miniUI::gadgetTitleBar("Preview"),
     miniUI::miniContentPanel(
-      shiny::tableOutput('table'),
+      shiny::fluidRow(
+        shiny::column(4, shiny::textInput("title", "title", "")),
+        shiny::column(1, shiny::checkboxInput("coediting", "coediting")),
+        shiny::column(1, shiny::checkboxInput("private", "private", TRUE)),
+        shiny::column(1, shiny::checkboxInput("gist", "gist")),
+        shiny::column(1, shiny::checkboxInput("tweet", "tweet"))
+      ),
+      shiny::div(
+        shiny::actionButton("upload", "Upload to imgur"),
+        shiny::textOutput("upload_result")
+      ),
       shiny::hr(),
       shiny::div(shiny::includeMarkdown(md_file))
     )
@@ -42,25 +55,44 @@ qiitaddin_post_qiita <- function(md_file, title, tags) {
 
   # Shiny Server -------------------------------------------------------
   server <- function(input, output, session) {
-    output$table <- shiny::renderTable(head(iris))
-    shiny::observeEvent(input$done, {
+    shiny::updateTextInput(session, "title", value = title)
 
+    shiny::observeEvent(input$upload, {
+      progress <- shiny::Progress$new(session, min=0, max=length(imgs))
+      on.exit(progress$close())
+
+      progress$set(message = "Uploading",
+                   detail  = "...")
+
+      for (i in 1:length(imgs)) {
+        progress$set(value = i, detail = imgs[i])
+        res <- imguR::upload_image(imgs[i], key = NULL, token = imgur_token)
+        md_text <- stringr::str_replace_all(md_text, stringr::fixed(imgs[i]), res$link)
+        Sys.sleep(0.5)
+      }
+
+      writeLines(md_text, md_file)
+      output$upload_result <- shiny::renderText("Done")
+      shiny::updateActionButton(session, "upload", icon = shiny::icon("check"))
+    })
+
+    shiny::observeEvent(input$done, {
       if(identical(Sys.getenv("QIITA_ACCESSTOKEN"), "")) {
-        token <- .rs.askForPassword("Input Qiita access token:")
+        token <- rstudioapi::askForPassword("Input Qiita access token:")
         Sys.setenv(QIITA_ACCESSTOKEN = token)
         return(FALSE)
       }
 
       result <- qiitr::qiita_post_item(
-        title = title,
-        body = body,
+        title = input$title,
+        body = read_utf8(md_file),
         tags = qiitr::qiita_util_tag("R"),
         # TODO: post without any tag is not permitted.
         # tags = lapply(tags, qiitr::qiita_util_tag),
-        coediting = FALSE,
-        private   = TRUE,
-        gist      = FALSE,
-        tweet     = FALSE
+        coediting = input$coediting,
+        private   = input$private,
+        gist      = input$gist,
+        tweet     = input$tweet
       )
 
       invisible(stopApp())
@@ -73,25 +105,12 @@ qiitaddin_post_qiita <- function(md_file, title, tags) {
 }
 
 
-qiitaddin_upload_images <- function(md_file) {
-  md_text <- paste(readLines(md_file, encoding = "UTF-8"), collapse = "\n")
-  imgs <- qiitaddin_extract_image_paths(md_text)
+qiitaddin_upload_images <- function(imgs) {
 
-  # Shiny UI -----------------------------------------------------------
-  ui <- miniUI::miniPage(
-    miniUI::gadgetTitleBar("Preview"),
-    miniUI::miniContentPanel(
-      shiny::tableOutput(iris)
-    )
-  )
+}
 
-  # Shiny Server -------------------------------------------------------
-  server <- function(input, output, session) {
-    shiny::observeEvent(input$upload, {})
-  }
-
-  viewer <- shiny::dialogViewer("Preview", width = 1000, height = 800)
-  shiny::runGadget(ui, server, viewer = viewer)
+read_utf8 <- function(x) {
+  paste(readLines(x, encoding = "UTF-8"), collapse = "\n")
 }
 
 qiitaddin_extract_image_paths <- function(md_text) {

@@ -15,7 +15,8 @@ Imports:
   htmltools,
   miniUI,
   xml2,
-  commonmark
+  commonmark,
+  imguR
 LazyData: TRUE
 RoxygenNote: 6.0.1
 Roxygen: list(markdown = TRUE)
