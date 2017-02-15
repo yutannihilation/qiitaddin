@@ -18,7 +18,7 @@ See: https://github.com/yutannihilation/qiitr#preperation
 
 #### Imgur or Gyazo account
 
-Since no method to upload image is provided by Qiita API, this package upload images to [Imgur](https://imgur.com/) or Gyazo(https://gyazo.com/). Though Imgur allows us to upload images anonymously, I recommend you to create an acount on either service, since those images uploaded without the owner cannot be deleted afterwards (as this package won't record the `deletehash`). 
+Since no method to upload image is provided by Qiita API, this package upload images to [Imgur](https://imgur.com/) or [Gyazo](https://gyazo.com/). Though Imgur allows us to upload images anonymously, I recommend you to create an acount on either service, since those images uploaded without the owner cannot be deleted afterwards (as this package won't record the `deletehash`). 
 You have been warned!
 
 ### Usage
@@ -45,12 +45,12 @@ After knitting the document is finished, the preview window appears. Review the 
 ![](usage2.png)
 
 
-When things are done, click "Done". You may asked to provide your Qiita access token as shown bellow. Please consider setting `QIITA_ACCESSTOKEN` environmental variable by `.Renviron`. For the details, please see [the README file in qiitr package](https://github.com/yutannihilation/qiitr#preperation).
+When things are done, click "Done". If you don't set `QIITA_ACCESSTOKEN` environmental variable, you will be asked to provide your Qiita access token as shown bellow.
 
 ![](usage3.png)
 
-After that, the document is quietly(this needs to be inproved) posted to Qiita as a private post.
+After that, the document is posted to Qiita and you will jump to the page.
 
-There are one important things you have to be careful about:
+Note that there are one important thing you have to be careful about:
 
 * Qiita is more formal place than Rpubs; Qiita people may get mad at you if you publish some test document that is not for sharing your knowledge, but for just testing Qiita API and this package. Never make it public.
