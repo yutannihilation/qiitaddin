@@ -24,5 +24,5 @@ After that, the document is quietly(this needs to be inproved) posted to Qiita a
 
 There are two important things you have to be careful about:
 
-* Since no method to upload images is provided by Qiita API, you have to upload images by hand.
+* Since no method to upload images is provided by Qiita API, this package uses Imgur experimentally.
 * Qiita is more formal place than Rpubs; Qiita people may get mad at you if you publish some test document that is not for sharing your knowledge, but for just testing Qiita API and this package. Never make it public.
