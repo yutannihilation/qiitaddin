@@ -37,9 +37,9 @@ After knitting the document is finished, the preview window appears. Review the 
 
 * `coediting`: A flag whether this item is co-edit mode (only available on Qiita:Team).
 * `private`: A flag whether this item is private (only available on Qiita).
-* `gist`: A flag to post data to Gist (only available if GitHub integration is enabled).
-* `tweet`: A flag to post a tweet (only available if Twitter integration is enabled).
 * `Upload images to`: Which service to upload images to. Currently, Imgur and Gyazo are supported.
+* `update an existing item`: Whether to update an existing item or to create a new item.
+* `Item ID`: The ID of an existing item. 
 
 ![](usage2.png)
 

@@ -38,16 +38,20 @@ qiitaddin_upload <- function(md_file, title, tags) {
     miniUI::gadgetTitleBar("Preview"),
     miniUI::miniContentPanel(
       shiny::fluidRow(
-        shiny::column(1, shiny::span("properties:")),
-        shiny::column(1,
+        shiny::column(2,
                       shiny::checkboxInput("coediting", "coediting"),
                       shiny::checkboxInput("private", "private", TRUE)),
-        shiny::column(1,
-                      shiny::checkboxInput("gist", "gist"),
-                      shiny::checkboxInput("tweet", "tweet")),
         shiny::column(4,
                       shiny::selectInput("upload_method", label = "Upload images to",
-                                         choices = c("Imgur", "Gyazo", "Imgur(anonymous)")))
+                                         choices = c("Imgur", "Gyazo", "Imgur(anonymous)"))),
+        shiny::column(2,
+                      shiny::checkboxInput("update", "update an existing item")),
+        shiny::column(4,
+                      shiny::conditionalPanel(
+                        condition = "input.update == true",
+                        shiny::textInput("item_id", label = "Item ID")
+                      )
+        )
       ),
       # TODO: tag
       shiny::hr(),
@@ -64,6 +68,14 @@ qiitaddin_upload <- function(md_file, title, tags) {
         Sys.setenv(QIITA_ACCESSTOKEN = token)
         return(FALSE)
       }
+
+      if(input$update) {
+        shiny::validate(
+          shiny::need(input$item_id, "item ID is empty!"),
+          shiny::need(is_valid_item_id(input$item_id), "No such item!")
+        )
+      }
+
 
       progress <- shiny::Progress$new(session, min=0, max=2)
       on.exit(progress$close())
@@ -88,18 +100,30 @@ qiitaddin_upload <- function(md_file, title, tags) {
       }
 
       # Step 2) Upload to Qiita
-      progress$set(message = "Uploading the document to Qiita...", detail = "")
-      result <- qiitr::qiita_post_item(
-        title = title,
-        body = md_text,
-        tags = qiitr::qiita_util_tag("R"),
-        # TODO: post without any tag is not permitted.
-        # tags = lapply(tags, qiitr::qiita_util_tag),
-        coediting = input$coediting,
-        private   = input$private,
-        gist      = input$gist,
-        tweet     = input$tweet
-      )
+      if(input$update) {
+        progress$set(message = "Updating the document on Qiita...",
+                     detail = sprintf("Item ID: %s", input$item_id))
+
+        result <- qiitr::qiita_update_item(
+          item_id = input$item_id,
+          title = title,
+          body = md_text,
+          tags = qiitr::qiita_util_tag("R"), # TODO: tags
+          # coediting = input$coediting,     # TODO: This is a bug filed as qiitr#5
+          private   = input$private
+        )
+      } else {
+        progress$set(message = "Uploading the document to Qiita...",
+                     detail = "")
+
+        result <- qiitr::qiita_post_item(
+          title = title,
+          body = md_text,
+          tags = qiitr::qiita_util_tag("R"), # TODO: tags
+          coediting = input$coediting,
+          private   = input$private
+        )
+      }
 
       progress$set(value = 2, message = "Done!")
       Sys.sleep(2)
@@ -123,4 +147,18 @@ extract_image_paths <- function(md_text) {
   html_doc <- xml2::read_html(commonmark::markdown_html(md_text))
   img_nodes <- xml2::xml_find_all(html_doc, ".//img")
   xml2::xml_attr(img_nodes, "src")
+}
+
+is_valid_item_id <- function(item_id) {
+  # check if the item exists
+  tryCatch(
+    {
+      qiitr::qiita_get_items(item_id = item_id)
+      return(TRUE)
+    },
+    error = function(e) {
+      warning("No such item: ", item_id, "\n Abort.")
+      return(FALSE)
+    }
+  )
 }
