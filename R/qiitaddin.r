@@ -31,8 +31,7 @@ qiitaddin_knit <- function(input = NULL) {
 
 qiitaddin_upload <- function(md_file, title, tags) {
   md_text <- read_utf8(md_file)
-  html_text <- commonmark::markdown_html(md_text)
-  imgs <- extract_image_paths(html_text)
+  imgs <- extract_image_paths(md_text)
 
   # Shiny UI -----------------------------------------------------------
   ui <- miniUI::miniPage(
@@ -57,7 +56,13 @@ qiitaddin_upload <- function(md_file, title, tags) {
       # TODO: tag
       shiny::hr(),
       shiny::h1(title, align = "center"),
-      shiny::div(shiny::HTML(html_text))
+      shiny::div(
+        shiny::HTML(
+          markdown::markdownToHTML(md_file,
+                                   fragment.only = TRUE,
+                                   encoding = "UTF-8")
+        )
+      )
     )
   )
 
@@ -144,8 +149,8 @@ read_utf8 <- function(x) {
   paste(readLines(x, encoding = "UTF-8"), collapse = "\n")
 }
 
-extract_image_paths <- function(html_text) {
-  html_doc <- xml2::read_html(html_text)
+extract_image_paths <- function(md_text) {
+  html_doc <- xml2::read_html(commonmark::markdown_html(md_text))
   img_nodes <- xml2::xml_find_all(html_doc, ".//img")
   xml2::xml_attr(img_nodes, "src")
 }
