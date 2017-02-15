@@ -7,6 +7,8 @@ Maintainer: Hiroaki Yutani <yutani.ini@gmail.com>
 Description: Knit an R Markdown file and post the result Markdown file to
     Qiita
 License: MIT + file LICENSE
+Depends:
+  R (>= 2.10)
 Imports:
   commonmark,
   httr,
@@ -15,7 +17,9 @@ Imports:
   rmarkdown,
   rstudioapi,
   shiny,
+  stringr,
   miniUI,
+  markdown,
   xml2,
   utils
 LazyData: TRUE
