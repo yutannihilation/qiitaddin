@@ -29,7 +29,7 @@ qiitaddin_knit <- function(input = NULL) {
 
 qiitaddin_upload <- function(md_file, title, tags) {
   md_text <- read_utf8(md_file)
-  imgs <- qiitaddin_extract_image_paths(md_text)
+  imgs <- extract_image_paths(md_text)
 
   # Shiny UI -----------------------------------------------------------
   ui <- miniUI::miniPage(
@@ -42,6 +42,10 @@ qiitaddin_upload <- function(md_file, title, tags) {
         shiny::column(1, shiny::checkboxInput("gist", "gist")),
         shiny::column(1, shiny::checkboxInput("tweet", "tweet"))
       ),
+      shiny::fluidRow(
+        shiny::column(4, shiny::selectInput("upload_method", label = "Upload images to",
+                                            choices = c("Imgur", "Gyazo")))
+      ),
       # TODO: tag
       shiny::hr(),
       shiny::div(shiny::includeMarkdown(md_file))
@@ -53,9 +57,6 @@ qiitaddin_upload <- function(md_file, title, tags) {
     shiny::updateTextInput(session, "title", value = title)
 
     shiny::observeEvent(input$done, {
-      # check credentials for Imgur and Qiita
-      imgur_token <- imguR::imgur_login()
-
       if(identical(Sys.getenv("QIITA_ACCESSTOKEN"), "")) {
         token <- rstudioapi::askForPassword("Input Qiita access token:")
         Sys.setenv(QIITA_ACCESSTOKEN = token)
@@ -66,15 +67,21 @@ qiitaddin_upload <- function(md_file, title, tags) {
       on.exit(progress$close())
 
       # Step 1) Upload to Imgur
-      progress$set(message = "Uploading the images to Imgur...")
+      progress$set(message = sprintf("Uploading the images to %s...", input$upload_method))
       num_imgs <- length(imgs)
+
+      upload_image <- switch(input$upload_method,
+                             "Imgur" = upload_image_imgur,
+                             "Gyazo" = upload_image_gyazo,
+                             stop("invalid choice", input$upload_method))
 
       for (i in 1:num_imgs) {
         progress$set(detail = imgs[i])
-        res <- imguR::upload_image(imgs[i], key = NULL, token = imgur_token)
-        progress$set(value = i/num_imgs)
 
-        md_text <- stringr::str_replace_all(md_text, stringr::fixed(imgs[i]), res$link)
+        image_url <- upload_image(imgs[i])
+        md_text <- stringr::str_replace_all(md_text, stringr::fixed(imgs[i]), image_url)
+
+        progress$set(value = i/num_imgs)
       }
 
       # Write the modified Markdown text to another file
@@ -97,6 +104,8 @@ qiitaddin_upload <- function(md_file, title, tags) {
       progress$set(value = 2, message = "Done!")
       Sys.sleep(2)
 
+      utils::browseURL(result$url)
+
       invisible(stopApp())
       return(result)
     })
@@ -110,7 +119,7 @@ read_utf8 <- function(x) {
   paste(readLines(x, encoding = "UTF-8"), collapse = "\n")
 }
 
-qiitaddin_extract_image_paths <- function(md_text) {
+extract_image_paths <- function(md_text) {
   html_doc <- xml2::read_html(commonmark::markdown_html(md_text))
   img_nodes <- xml2::xml_find_all(html_doc, ".//img")
   xml2::xml_attr(img_nodes, "src")

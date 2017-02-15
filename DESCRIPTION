@@ -8,15 +8,16 @@ Description: Knit an R Markdown file and post the result Markdown file to
     Qiita
 License: MIT + file LICENSE
 Imports:
+  commonmark,
+  httr,
+  imguR,
+  qiitr,
   rmarkdown,
   rstudioapi,
-  qiitr,
   shiny,
-  htmltools,
   miniUI,
   xml2,
-  commonmark,
-  imguR
+  utils
 LazyData: TRUE
 RoxygenNote: 6.0.1
 Roxygen: list(markdown = TRUE)
