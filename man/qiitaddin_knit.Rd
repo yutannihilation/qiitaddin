@@ -2,7 +2,7 @@
 % Please edit documentation in R/qiitaddin.r
 \name{qiitaddin_knit}
 \alias{qiitaddin_knit}
-\title{Knit And Post A Rmarkdown Document to Qiita}
+\title{Publish R Markdown Document to Qiita}
 \usage{
 qiitaddin_knit(input = NULL)
 }
@@ -10,5 +10,5 @@ qiitaddin_knit(input = NULL)
 \item{input}{path to a .Rmd file. If \code{NULL}, use the activedocument.}
 }
 \description{
-Knit And Post A Rmarkdown Document to Qiita
+Knit and post a given R Markdown file to Qiita. Images will be uploaded to Imgur or Gyazo.
 }

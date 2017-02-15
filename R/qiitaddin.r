@@ -1,4 +1,6 @@
-#' Knit And Post A Rmarkdown Document to Qiita
+#' Publish R Markdown Document to Qiita
+#'
+#' Knit and post a given R Markdown file to Qiita. Images will be uploaded to Imgur or Gyazo.
 #'
 #' @param input path to a .Rmd file. If `NULL`, use the activedocument.
 #'
@@ -44,7 +46,7 @@ qiitaddin_upload <- function(md_file, title, tags) {
       ),
       shiny::fluidRow(
         shiny::column(4, shiny::selectInput("upload_method", label = "Upload images to",
-                                            choices = c("Imgur", "Gyazo")))
+                                            choices = c("Imgur", "Gyazo", "Imgur(anonymous)")))
       ),
       # TODO: tag
       shiny::hr(),
@@ -66,13 +68,14 @@ qiitaddin_upload <- function(md_file, title, tags) {
       progress <- shiny::Progress$new(session, min=0, max=2)
       on.exit(progress$close())
 
-      # Step 1) Upload to Imgur
+      # Step 1) Upload to Imgur or Gyazo
       progress$set(message = sprintf("Uploading the images to %s...", input$upload_method))
       num_imgs <- length(imgs)
 
       upload_image <- switch(input$upload_method,
                              "Imgur" = upload_image_imgur,
                              "Gyazo" = upload_image_gyazo,
+                             "Imgur(anonymous)" = upload_image_imgur_anonymously,
                              stop("invalid choice", input$upload_method))
 
       for (i in 1:num_imgs) {
@@ -83,9 +86,6 @@ qiitaddin_upload <- function(md_file, title, tags) {
 
         progress$set(value = i/num_imgs)
       }
-
-      # Write the modified Markdown text to another file
-      writeLines(md_text, paste0(md_file,".uploaded"))
 
       # Step 2) Upload to Qiita
       progress$set(message = "Uploading the document to Qiita...", detail = "")

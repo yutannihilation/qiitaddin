@@ -5,7 +5,6 @@
 #' @param file Path to an image file.
 #'
 #' @return A URL of the uploaded image.
-#' @export
 upload_image_gyazo <- function(file) {
   gyazo_token <- httr::oauth2.0_token(
     endpoint = gyazo_endpoint(),
