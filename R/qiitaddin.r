@@ -31,6 +31,7 @@ qiitaddin_knit <- function(input = NULL) {
 
 qiitaddin_upload <- function(md_file, title, tags) {
   md_text <- read_utf8(md_file)
+  md_dir <- dirname(md_file)
   imgs <- extract_image_paths(md_text)
 
   # Shiny UI -----------------------------------------------------------
@@ -99,7 +100,7 @@ qiitaddin_upload <- function(md_file, title, tags) {
       for (i in seq_along(imgs)) {
         progress$set(detail = imgs[i])
 
-        image_url <- upload_image(imgs[i])
+        image_url <- upload_image(file.path(md_dir, imgs[i]))
         md_text <- stringr::str_replace_all(md_text, stringr::fixed(imgs[i]), image_url)
 
         progress$set(value = i/num_imgs)
