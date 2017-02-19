@@ -88,7 +88,6 @@ qiitaddin_upload <- function(md_file, title, tags) {
 
       # Step 1) Upload to Imgur or Gyazo
       progress$set(message = sprintf("Uploading the images to %s...", input$upload_method))
-      num_imgs <- length(imgs)
 
       upload_image <- switch(input$upload_method,
                              "Imgur" = upload_image_imgur,
@@ -96,7 +95,8 @@ qiitaddin_upload <- function(md_file, title, tags) {
                              "Imgur(anonymous)" = upload_image_imgur_anonymously,
                              stop("invalid choice", input$upload_method))
 
-      for (i in 1:num_imgs) {
+      num_imgs <- length(imgs)
+      for (i in seq_along(imgs)) {
         progress$set(detail = imgs[i])
 
         image_url <- upload_image(imgs[i])
