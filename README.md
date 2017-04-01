@@ -21,6 +21,8 @@ See: https://github.com/yutannihilation/qiitr#preperation
 Since no method to upload image is provided by Qiita API, this package upload images to [Imgur](https://imgur.com/) or [Gyazo](https://gyazo.com/). Though Imgur allows us to upload images anonymously, I recommend you to create an acount on either service, since those images uploaded without the owner cannot be deleted afterwards (as this package won't record the `deletehash`). 
 You have been warned!
 
+If you will upload many images, I recommend Gyazo, since Imgur has some secret limit rating which you will easily hit.
+
 ### Usage
 
 After making sure that the target R Markdown file is active, click "Post to Qiita".

@@ -101,7 +101,7 @@ qiitaddin_upload <- function(md_file, title, tags) {
         progress$set(detail = imgs[i])
 
         # attempt to avoid rate limits
-        Sys.sleep(2)
+        Sys.sleep(0.2)
 
         image_url <- upload_image(file.path(md_dir, imgs[i]))
         md_text <- stringr::str_replace_all(md_text, stringr::fixed(imgs[i]), image_url)
